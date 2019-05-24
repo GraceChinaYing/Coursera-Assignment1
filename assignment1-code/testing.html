@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>anglar为核心验证</title>
+        <script src="js/angular.min.js"></script>
+        <style>
+            input{
+                display: block;
+            }
+            ul li{
+                color: red;
+            }
+        </style>
+
+
+        <script>
+            angular.module("myapp",[])
+            .controller("demoC",function($scope){
+                $scope.datas = [{
+                        id: 10011120,
+                        name: "iphoneX",
+                        num: 99
+                    },
+                    {
+                        id: 10011121,
+                        name: "华为mate10",
+                        num: 20
+                    },
+                    {
+                        id: 10011122,
+                        name: "vivoR12",
+                        num: 55
+                    }
+                ]; //定义一个数组
+
+
+                $scope.save=function(){
+                    //创建一个存放错误信息数组
+                    $scope.error_val=[];
+                    $scope.name2="";
+
+                    var reg_id=/^\d{8,8}$/;  //只能8位数字
+                    if(!reg_id.test($scope.id)){
+                        $scope.error_val.push("资产编号格式，必须为数字，且长度为8位");
+                    }
+                    //资产名称
+                    if($scope.name==undefined||$scope.name==""){
+                        $scope.error_val.push("资产名称不能为空!");
+                    }else{
+                        for(var i in $scope.datas){
+                            if($scope.name==$scope.datas[i].name){
+                                $scope.error_val.push("资产名称已经存在");
+                                break;  //结束循环,已经查找到资产名称不合法
+                            }
+                        }
+                    }
+                    //资产数量
+                    var reg_num=/^\d{1,}$/;  //只能8位数字
+                    if(!reg_num.test($scope.num)){
+                        $scope.error_val.push("资产编号数量，必须为数字");
+                    }else{
+                        if($scope.num<=0){
+                            $scope.error_val.push("资产编号数量必须大于0");
+                        }
+                    }
+
+                    //何时添加进行,何时不添加
+                    if($scope.error_val.length==0){
+                        $scope.datas.push({
+                            id:$scope.id,
+                            name:$scope.name,
+                            num:$scope.num
+                        });
+                    }
+                }
+
+
+                $scope.sel=function(){
+                    if($scope.selname==undefined||$scope.selname==""){
+                        alert("搜索内容不能为空");
+                        return;
+                    }
+
+                    var i=false;
+                    for(var i in $scope.datas){
+                        if($scope.selname==$scope.datas[i].name){
+                            $scope.name2=$scope.selname;
+                            i=true;
+                            break;  //结束循环,已经查找到资产名称不合法
+                        }
+                    }
+
+                    console.log("----------"+$scope.name2);
+
+                    if(i==true){
+                        alert("查找到内容");
+                    }else{
+                        alert("没有此商品");
+                    }
+                }
+            })
+
+        </script>
+    </head>
+    <body ng-app="myapp" ng-controller="demoC">
+        <input type="text" ng-model="selname" />
+        <button ng-click="sel()">搜索</button>
+
+
+        <table border="1px solid">
+            <tr>
+                <td>资产编号</td>
+                <td>资产名称</td>
+                <td>资产数量</td>
+            </tr>
+            <tr ng-repeat="d in datas|filter:{name:name2}">
+                <td>{{d.id}}</td>
+                <td>{{d.name}}</td>
+                <td>{{d.num}}</td>
+            </tr>
+        </table>
+
+
+        <div>
+            <form>
+                资产编号<input ng-model="id" />
+                资产名称<input ng-model="name" />
+                资产数量<input ng-model="num" />
+
+                <div>
+                    <ul>
+                        <li ng-repeat="e in error_val">
+                            {{e}}
+                        </li>
+                    </ul>
+                </div>
+                <button ng-click="save()">
+                资产录入
+                </button>
+            </form>
+        </div>
+    </body>
+</html>
